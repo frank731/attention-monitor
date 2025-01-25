@@ -5,8 +5,11 @@ from analysis.attention_classifier import AttentionClassifier
 
 from utils.visualization import draw_detections
 
+import dlib
+
 def main():
     face_detector = FaceDetector()
+    face_detector.load_reference_images("class_images")
     #pose_estimator = PoseEstimator()
     #attention_classifier = AttentionClassifier()
 
