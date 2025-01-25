@@ -1,0 +1,7 @@
+opencv-python
+numpy
+tensorflow
+scikit-learn
+matplotlib
+face-recognition
+dlib==19.22.1
