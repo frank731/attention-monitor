@@ -20,9 +20,9 @@ class AttentionTimes:
 
 @dataclass
 class AttentionStrings:
-    focused: str
-    distracted: str
-    on_phone: str
+    focused_str: str
+    distracted_str: str
+    on_phone_str: str
 
 def format_seconds(seconds):
    """Convert seconds into human readable string, showing only needed units."""
@@ -54,7 +54,6 @@ class AsyncAttentionMonitor:
         result = self.attention_classifier.classify_attention(face)
         if name not in self.stats:
             self.stats[name] = []
-        print(result)
         self.stats[name].append((result, cur_time))
 
     def count_attention(self, name: str) -> AttentionTimes:
@@ -81,10 +80,22 @@ class AsyncAttentionMonitor:
     
     def format_attention_as_str(self, times: AttentionTimes) -> AttentionStrings:
         return AttentionStrings(
-            focused=format_seconds(times.focused),
-            distracted=format_seconds(times.distracted),
-            on_phone=format_seconds(times.on_phone)
+            focused_str=format_seconds(times.focused),
+            distracted_str=format_seconds(times.distracted),
+            on_phone_str=format_seconds(times.on_phone)
         )
+    
+    def get_cumulative_attention(self) -> AttentionTimes:
+        names = list(self.stats.keys())
+        total_attention = AttentionTimes(0, 0, 0)
+
+        for name in names:
+            times = self.count_attention(name)
+            total_attention.focused += times.focused
+            total_attention.distracted += times.distracted
+            total_attention.on_phone += times.on_phone
+
+        return total_attention
     
     def scale_bbox(self, bbox, screen_height, screen_width, scale_x=3):
         x, y, w, h = bbox
@@ -139,6 +150,10 @@ class AsyncAttentionMonitor:
                 break
 
             frame_count += 1
+
+            for name in self.stats:
+                attn = self.format_attention_as_str(self.count_attention(name))
+                print(f"{name}: {attn.focused_str} focused, {attn.distracted_str} distracted, {attn.on_phone_str} on phone")
 
         video_capture.release()
         cv2.destroyAllWindows()
