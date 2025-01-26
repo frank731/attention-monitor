@@ -1,6 +1,6 @@
 import cv2
 import dotenv
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import numpy as np
 import threading
 from detection.face_detector import FaceDetector
@@ -15,19 +15,18 @@ class AsyncAttentionMonitor:
         self.face_detector = FaceDetector()
         self.names_to_filepath = self.face_detector.load_reference_images("class_images")
         self.attention_classifier = AttentionClassifier()
-        self.last_time = time()
 
         # store frames of distraction/focus by name
-        self.stats: Dict[str, List[AttentionStatus]] = {}
+        self.stats: Dict[str, List[Tuple[AttentionStatus, int]]] = {}
     
     def classify_person(self, face: np.ndarray, name: str):
         cur_time = time()
-        
         result = self.attention_classifier.classify_attention(face)
         if name not in self.stats:
             self.stats[name] = []
         
-        self.stats[name].append(result)
+        self.stats[name].append((result, cur_time))
+        
     
     def scale_bbox(self, bbox, screen_height, scale_x=3):
         x, y, w, h = bbox
