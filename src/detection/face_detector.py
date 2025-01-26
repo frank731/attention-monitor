@@ -11,6 +11,7 @@ class FaceDetector:
 
     def load_reference_images(self, reference_images_path):
         # Images need to follow name convention "firstname_lastname.ext"
+        name_to_filepath = {}
         for filename in os.listdir(reference_images_path):
             name = " ".join(filename.split(".")[0].split("_")).title()
 
@@ -19,7 +20,8 @@ class FaceDetector:
 
             self.face_encodings.append(face_encoding)
             self.names.append(name)
-        print(self.names)
+            name_to_filepath[name] = os.path.join(reference_images_path, filename)
+        return name_to_filepath
 
     def detect_faces(self, gray, frame):
         face_locations = self.face_classifier.detectMultiScale(gray) #face_recognition.face_locations(frame, model="hog")

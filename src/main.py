@@ -5,11 +5,9 @@ from analysis.attention_classifier import AttentionClassifier
 
 from utils.visualization import draw_detections
 
-import dlib
-
 def main():
     face_detector = FaceDetector()
-    face_detector.load_reference_images("class_images")
+    all_names = face_detector.load_reference_images("class_images")
     #pose_estimator = PoseEstimator()
     attention_classifier = AttentionClassifier()
 
@@ -29,7 +27,7 @@ def main():
         extracted_faces = face_detector.extract_face_images(frame, faces)
                                                             
         for face in extracted_faces:
-            attention_classifier.classify_attention(extracted_faces)
+            attention_classifier.classify_attention(face)
         
         # Visualize results
         # (Assuming a function in visualization.py to draw results)
