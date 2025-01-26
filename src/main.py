@@ -11,9 +11,9 @@ def main():
     face_detector = FaceDetector()
     face_detector.load_reference_images("class_images")
     #pose_estimator = PoseEstimator()
-    #attention_classifier = AttentionClassifier()
+    attention_classifier = AttentionClassifier()
 
-    # Initialize webcam
+        # Initialize webcam
     video_capture = cv2.VideoCapture(0)
 
     while True:
@@ -25,20 +25,12 @@ def main():
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         # Process frame for face detection
-        faces, names = face_detector.detect_faces(rgb_frame)
-        extracted_faces = face_detector.extract_face_images(gray_frame, faces)
-        for (x, y, w, h), face in zip(faces, extracted_faces):
-            # Convert grayscale face to BGR (color) format
-            color_face = cv2.cvtColor(face, cv2.COLOR_GRAY2BGR)
-            # Resize and overlay onto frame
-            frame[y:y+h, x:x+w] = cv2.resize(color_face, (w, h))
-
-        # Estimate poses for detected faces
-        #poses = pose_estimator.estimate_pose(frame, faces)
-
-        # Classify attention for each detected individual
-        #attention_status = attention_classifier.classify_attention(poses)
-
+        faces, names = face_detector.detect_faces(gray_frame, rgb_frame)
+        extracted_faces = face_detector.extract_face_images(frame, faces)
+                                                            
+        for face in extracted_faces:
+            attention_classifier.classify_attention(extracted_faces)
+        
         # Visualize results
         # (Assuming a function in visualization.py to draw results)
         draw_detections(frame, faces, names)

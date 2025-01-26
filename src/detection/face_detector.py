@@ -1,8 +1,11 @@
 import os
 import face_recognition
+import cv2
+import np
 
 class FaceDetector:
     def __init__(self):
+        self.face_classifier = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
         self.face_encodings = []
         self.names = []
 
@@ -16,23 +19,28 @@ class FaceDetector:
 
             self.face_encodings.append(face_encoding)
             self.names.append(name)
+        print(self.names)
 
-    def detect_faces(self, frame):
-        face_locations = face_recognition.face_locations(frame)
-        face_encodings = face_recognition.face_encodings(frame, face_locations)
+    def detect_faces(self, gray, frame):
+        face_locations = self.face_classifier.detectMultiScale(gray) #face_recognition.face_locations(frame, model="hog")
+        face_encodings = face_recognition.face_encodings(frame, self.convert_coordinate_format(face_locations))
 
+        parsed_face_locations = []
         face_names = []
-        for face_encoding in face_encodings:
+        for ind, face_encoding in enumerate(face_encodings):
             matches = face_recognition.compare_faces(self.face_encodings, face_encoding)
-            name = "Unknown"
+            name = None
 
-            if True in matches:
-                first_match_index = matches.index(True)
-                name = self.names[first_match_index]
+            face_distances = face_recognition.face_distance(self.face_encodings, face_encoding)
+            best_match_index = np.argmin(face_distances)
+            if matches[best_match_index]:
+                name = self.names[best_match_index]
             
-            face_names.append(name)
-        
-        return face_locations, face_names
+            if name is not None:
+                parsed_face_locations.append(face_locations[ind])
+                face_names.append(name)
+
+        return parsed_face_locations, face_names
 
     def extract_face_images(self, frame, faces):
         face_images = []
@@ -40,3 +48,13 @@ class FaceDetector:
             x, y, w, h = face
             face_images.append(frame[y:y+h, x:x+w])
         return face_images
+
+    def convert_coordinate_format(self, coords):
+        ret = []
+        for coord in coords:
+            top = coord[1]
+            right = coord[0] + coord[2]
+            bottom = coord[1] + coord[3]
+            left = coord[0]
+            ret.append((top, right, bottom, left))
+        return ret
