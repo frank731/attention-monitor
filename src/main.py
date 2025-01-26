@@ -75,7 +75,7 @@ class AsyncAttentionMonitor:
             relief="ridge",
         )
 
-        self.video_capture = cv2.VideoCapture(0)
+        self.video_capture = cv2.VideoCapture(1)
 
         self.frame_count = 0
         self._images = []

@@ -104,15 +104,15 @@ class AttentionClassifier:
 
         base64_image = encode_numpy_image(image)
         response = self.model.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4o",
             messages=[
                 {
                     "role": "user",
                     "content": [
                         {"type": "text", "text": """This is a photo of someone during a lecture. Does it look like this person is:
-(a) On their phone
-(b) Not paying attention or distracted
-(c) Paying attention to the lecture
+(a) Looking at the camera and paying attention
+(b) Looking down or around and not paying attention or distracted
+(c) Using their phone
 
 Answer with just the letter."""},
                         {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}", "detail": "low" }}
@@ -122,7 +122,7 @@ Answer with just the letter."""},
         )
 
         letter = response.choices[0].message.content.lower().split()[0]
-        if "a" in letter:
+        if "c" in letter:
             return AttentionStatus.OnPhone
         if "b" in letter:
             return AttentionStatus.Distracted
