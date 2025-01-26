@@ -83,6 +83,12 @@ class AttentionStatus:
     Distracted = "DISTRACTED"
     Focused = "FOCUSED"
 
+STATUS_TO_TEXT = {
+    AttentionStatus.OnPhone: "On Phone",
+    AttentionStatus.Distracted: "Distracted",
+    AttentionStatus.Focused: "Attentive"
+}
+
 class AttentionClassifier:
     def __init__(self):
         self.model = None
