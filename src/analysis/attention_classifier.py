@@ -115,8 +115,7 @@ Answer with just the letter."""},
             ]
         )
 
-        print(response)
-        letter = response.lower().split()[0]
+        letter = response.choices[0].message.content.lower().split()[0]
         if "a" in letter:
             return AttentionStatus.OnPhone
         if "b" in letter:
