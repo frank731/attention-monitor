@@ -50,9 +50,9 @@ class AsyncAttentionMonitor:
             for bounding in faces_bounding:
                 classification_bboxes.append(self.scale_bbox(bounding, screen_height))
 
-            extracted_faces = self.face_detector.extract_face_images(frame, faces_bounding)
+            extracted_faces = self.face_detector.extract_face_images(frame, classification_bboxes)
 
-            if frame_count % 100 == 0 and extracted_faces:
+            if frame_count % 10 == 0 and extracted_faces:
                 for extracted_face, name in zip(extracted_faces, names):
                     thread = threading.Thread(target=self.classify_person,
                         args=(extracted_face, name)
