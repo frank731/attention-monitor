@@ -48,7 +48,7 @@ class FaceDetector:
         face_images = []
         for face in faces:
             x, y, w, h = face
-            face_images.append(frame[y:y+h, x:x+w])
+            face_images.append(np.copy(frame[y:y+h, x:x+w]))
         return face_images
 
     def convert_coordinate_format(self, coords):

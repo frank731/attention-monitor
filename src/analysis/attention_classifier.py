@@ -75,11 +75,6 @@ def predict_pose(frame, model, device):
 
 
 def encode_numpy_image(image_array):
-    # Convert to BGR format if in RGB
-    if image_array.shape[2] == 3:
-        image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
-    
-    # Encode to jpg
     _, buffer = cv2.imencode('.jpg', image_array)
     return base64.b64encode(buffer).decode('utf-8')
 
@@ -99,14 +94,12 @@ class AttentionClassifier:
     def prompt_model_estimator_mock_test(self, image: np.ndarray) -> AttentionStatus:
         import openai
         import time
-
-        print("hello", time.time())
-        time.sleep(1)
-        print("hello2", time.time())
-        return AttentionStatus.Distracted
-        
         if not self.model:
             self.model = openai.Client()
+
+        image_b64 = encode_numpy_image(image)
+        with open("image.png", "wb") as f:
+            f.write(base64.decodebytes(image_b64.encode("utf-8")))
 
         base64_image = encode_numpy_image(image)
         response = self.model.chat.completions.create(
@@ -115,8 +108,13 @@ class AttentionClassifier:
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": "What is in this image?"},
-                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
+                        {"type": "text", "text": """This is a photo of someone during a lecture. Does it look like this person is:
+(a) On their phone
+(b) Not paying attention or distracted
+(c) Paying attention to the lecture
+
+Answer with just the letter."""},
+                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}", "detail": "low" }}
                     ]
                 }
             ]
