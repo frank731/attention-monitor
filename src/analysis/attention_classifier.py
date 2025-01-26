@@ -93,13 +93,8 @@ class AttentionClassifier:
 
     def prompt_model_estimator_mock_test(self, image: np.ndarray) -> AttentionStatus:
         import openai
-        import time
         if not self.model:
             self.model = openai.Client()
-
-        image_b64 = encode_numpy_image(image)
-        with open("image.png", "wb") as f:
-            f.write(base64.decodebytes(image_b64.encode("utf-8")))
 
         base64_image = encode_numpy_image(image)
         response = self.model.chat.completions.create(
@@ -121,8 +116,13 @@ Answer with just the letter."""},
         )
 
         print(response)
+        letter = response.lower().split()[0]
+        if "a" in letter:
+            return AttentionStatus.OnPhone
+        if "b" in letter:
+            return AttentionStatus.Distracted
 
-        return None
+        return AttentionStatus.Focused
     
 
     def prompt_model_estimator_custom_model(self, image):
