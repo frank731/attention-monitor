@@ -1,10 +1,13 @@
 import cv2
+import dotenv
 from typing import Dict, List
 import numpy as np
 import threading
 from detection.face_detector import FaceDetector
 from analysis.attention_classifier import AttentionClassifier, AttentionStatus
 from utils.visualization import draw_detections
+
+dotenv.load_dotenv()
 
 class AsyncAttentionMonitor:
     def __init__(self):
